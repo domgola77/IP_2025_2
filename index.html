@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularz Umowy</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --bg-color: #ffffff;
+            --bg-secondary: #f9fafb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-secondary);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #6b7280;
+            cursor: pointer;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            margin-right: 8px;
+            font-size: 12px;
+        }
+
+        .step.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .form-content {
+            padding: 30px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        input.error, select.error, textarea.error {
+            border-color: var(--error-color);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button.prev {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+
+        button.prev:hover {
+            background-color: #d1d5db;
+        }
+
+        button.next, button.submit {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        button.next:hover, button.submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.skip {
+            background-color: transparent;
+            color: #6b7280;
+            text-decoration: underline;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .success-message.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+
+        .file-input-container {
+            position: relative;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #e5e7eb;
+            color: #4b5563;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .file-input-label:hover {
+            background-color: #d1d5db;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .automatic-step {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .steps {
+                padding: 10px;
+            }
+            
+            .step {
+                font-size: 12px;
+            }
+            
+            .form-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Formularz Umowy</h1>
+        </div>
+        
+        <div class="steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <span>Dane dokumentu</span>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <span>Kontrola jakości</span>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <span>Priorytet</span>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <span>Weryfikacja CBK</span>
+            </div>
+            <div class="step" data-step="5">
+                <div class="step-number">5</div>
+                <span>Walidacja VAT</span>
+            </div>
+            <div class="step" data-step="6">
+                <div class="step-number">6</div>
+                <span>Akceptacja</span>
+            </div>
+            <div class="step" data-step="7">
+                <div class="step-number">7</div>
+                <span>Recenzja prawna</span>
+            </div>
+            <div class="step" data-step="8">
+                <div class="step-number">8</div>
+                <span>E-podpis</span>
+            </div>
+            <div class="step" data-step="9">
+                <div class="step-number">9</div>
+                <span>Rejestracja CRD</span>
+            </div>
+        </div>
+        
+        <form id="contractForm">
+            <div class="form-content">
+                <!-- Krok 1: Dane dokumentu -->
+                <div class="form-step active" data-step="1">
+                    <h2>Dane dokumentu</h2>
+                    
+                    <div class="form-group">
+                        <label for="supplierName">Nazwa dostawcy</label>
+                        <input type="text" id="supplierName" name="supplierName">
+                        <div class="error-message" id="supplierName-error">Proszę podać nazwę dostawcy.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplierNip">NIP dostawcy</label>
+                        <input type="text" id="supplierNip" name="supplierNip" maxlength="10">
+                        <div class="error-message" id="supplierNip-error">Proszę wpisać 10-cyfrowy numer NIP.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contractNumber">Numer umowy</label>
+                        <input type="text" id="contractNumber" name="contractNumber" placeholder="np. UM-2025-001">
+                        <div class="error-message" id="contractNumber-error">Proszę podać numer umowy w formacie UM-YYYY-NNN.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contractDate">Data umowy</label>
+                        <input type="date" id="contractDate" name="contractDate">
+                        <div class="error-message" id="contractDate-error">Proszę wybrać datę umowy.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="documentType">Typ dokumentu</label>
+                        <select id="documentType" name="documentType">
+                            <option value="">Wybierz typ dokumentu</option>
+                            <option value="Umowa">Umowa</option>
+                            <option value="Załącznik">Załącznik</option>
+                        </select>
+                        <div class="error-message" id="documentType-error">Proszę wybrać typ dokumentu.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contractAmount">Kwota umowy</label>
+                        <input type="number" id="contractAmount" name="contractAmount" step="0.01" min="0">
+                        <div class="error-message" id="contractAmount-error">Proszę wpisać kwotę większą od 0.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bankAccount">Numer rachunku bankowego</label>
+                        <input type="text" id="bankAccount" name="bankAccount">
+                        <div class="error-message" id="bankAccount-error">Proszę podać numer rachunku w formacie IBAN.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contractFile">Plik umowy (PDF)</label>
+                        <div class="file-input-container">
+                            <label class="file-input-label" for="contractFile">Wybierz plik</label>
+                            <input type="file" id="contractFile" name="contractFile" accept=".pdf">
+                            <div class="file-name" id="file-name-display"></div>
+                        </div>
+                        <div class="error-message" id="contractFile-error">Proszę załączyć plik PDF.</div>
+                    </div>
+                    
+                    <div class="buttons">
+                        <div></div> <!-- Placeholder for alignment -->
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(2)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(1)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 2: Kontrola jakości -->
+                <div class="form-step" data-step="2">
+                    <h2>Kontrola jakości</h2>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="qcComplete" name="qcComplete">
+                            <label for="qcComplete">Wszystkie pola są wypełnione</label>
+                        </div>
+                        <div class="error-message" id="qcComplete-error">Potwierdź, że wszystkie pola są wypełnione.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qcRemarks">Uwagi (opcjonalnie)</label>
+                        <textarea id="qcRemarks" name="qcRemarks" rows="4" maxlength="500"></textarea>
+                        <div class="error-message" id="qcRemarks-error">Uwagi nie mogą przekraczać 500 znaków.</div>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(2)">Wstecz</button>
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(3)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(2)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 3: Priorytet -->
+                <div class="form-step" data-step="3">
+                    <h2>Priorytetyzacja</h2>
+                    
+                    <div class="form-group">
+                        <label for="priorityLevel">Poziom priorytetu</label>
+                        <select id="priorityLevel" name="priorityLevel">
+                            <option value="">Wybierz priorytet</option>
+                            <option value="Wysoki">Wysoki</option>
+                            <option value="Normalny">Normalny</option>
+                            <option value="Niski">Niski</option>
+                        </select>
+                        <div class="error-message" id="priorityLevel-error">Proszę wybrać priorytet dokumentu.</div>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(3)">Wstecz</button>
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(4)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(3)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 4: Weryfikacja CBK (automatyczna) -->
+                <div class="form-step" data-step="4">
+                    <div class="automatic-step">
+                        <h2>Weryfikacja CBK</h2>
+                        <p>Trwa automatyczna weryfikacja na podstawie numeru NIP...</p>
+                        <div class="loader"></div>
+                        <p id="cbk-result">Oczekiwanie na wyniki...</p>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(4)">Wstecz</button>
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(5)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(4)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 5: Walidacja VAT (automatyczna) -->
+                <div class="form-step" data-step="5">
+                    <div class="automatic-step">
+                        <h2>Walidacja Białej Listy VAT</h2>
+                        <p>Trwa automatyczna walidacja numeru NIP i rachunku bankowego...</p>
+                        <div class="loader"></div>
+                        <p id="vat-result">Oczekiwanie na wyniki...</p>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(5)">Wstecz</button>
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(6)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(5)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 6: Akceptacja kierownika -->
+                <div class="form-step" data-step="6">
+                    <h2>Akceptacja kierownika zakupów (to co widzi kierownik)</h2>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="approvalDecision" name="approvalDecision">
+                            <label for="approvalDecision">Akceptuję umowę</label>
+                        </div>
+                        <div class="error-message" id="approvalDecision-error">Proszę potwierdzić akceptację umowy.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="approvalComments">Komentarz (opcjonalnie)</label>
+                        <textarea id="approvalComments" name="approvalComments" rows="4" maxlength="500"></textarea>
+                        <div class="error-message" id="approvalComments-error">Komentarz nie może przekroczyć 500 znaków.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="approvalDate">Data akceptacji</label>
+                        <input type="text" id="approvalDate" name="approvalDate" readonly>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(6)">Wstecz</button>
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(7)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(6)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 7: Recenzja prawna -->
+                <div class="form-step" data-step="7">
+                    <h2>Recenzja działu prawnego (to widzi dział prawny)</h2>
+                    
+                    <div class="form-group">
+                        <label for="reviewComments">Uwagi prawne</label>
+                        <textarea id="reviewComments" name="reviewComments" rows="4"></textarea>
+                        <div class="error-message" id="reviewComments-error">Wpisz uwagi, jeśli dokument wymaga poprawek.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="finalVersionReady" name="finalVersionReady">
+                            <label for="finalVersionReady">Wersja jest ostateczna</label>
+                        </div>
+                        <div class="error-message" id="finalVersionReady-error">Zaznacz, czy to już wersja do podpisu.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reviewDate">Data recenzji</label>
+                        <input type="text" id="reviewDate" name="reviewDate" readonly>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(7)">Wstecz</button>
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(8)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(7)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 8: E-podpis -->
+                <div class="form-step" data-step="8">
+                    <h2>E-podpis</h2>
+                    
+                    <div class="form-group">
+                        <label for="signature">Podpis elektroniczny</label>
+                        <input type="text" id="signature" name="signature" placeholder="Token lub certyfikat">
+                        <div class="error-message" id="signature-error">Proszę złożyć podpis elektroniczny.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signatureDate">Data podpisu</label>
+                        <input type="text" id="signatureDate" name="signatureDate" readonly>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(8)">Wstecz</button>
+                        <div>
+                            <button type="button" class="skip" onclick="skipToStep(9)">Pomiń krok</button>
+                            <button type="button" class="next" onclick="nextStep(8)">Dalej</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Krok 9: Rejestracja CRD -->
+                <div class="form-step" data-step="9">
+                    <h2>Rejestracja umowy w CRD</h2>
+                    
+                    <div class="form-group">
+                        <label for="crdEntryId">Identyfikator CRD</label>
+                        <input type="text" id="crdEntryId" name="crdEntryId" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reviewReminderDate">Data przypomnienia o przeglądzie</label>
+                        <input type="date" id="reviewReminderDate" name="reviewReminderDate">
+                        <div class="error-message" id="reviewReminderDate-error">Proszę wybrać datę przypomnienia.</div>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button type="button" class="prev" onclick="prevStep(9)">Wstecz</button>
+                        <button type="button" class="submit" onclick="submitForm()">Zatwierdź</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Komunikat sukcesu -->
+        <div class="success-message" id="success-message">
+            <div class="success-icon">✓</div>
+            <h2>Formularz został pomyślnie przesłany!</h2>
+            <p>Twoja umowa została zarejestrowana w systemie.</p>
+            <p>Identyfikator umowy: <span id="success-contract-id"></span></p>
+            <button type="button" class="next" onclick="resetForm()">Nowy formularz</button>
+        </div>
+    </div>
+
+    <script>
+        // Zmienne globalne
+        let currentStep = 1;
+        const totalSteps = 9;
+        
+        // Inicjalizacja formularza
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ustawienie dzisiejszej daty dla pól automatycznych
+            const today = new Date();
+            const formattedDate = formatDate(today);
+            
+            document.getElementById('approvalDate').value = formattedDate;
+            document.getElementById('reviewDate').value = formattedDate;
+            document.getElementById('signatureDate').value = formattedDate;
+            
+            // Generowanie identyfikatora CRD
+            const randomId = 'CRD-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            document.getElementById('crdEntryId').value = randomId;
+            
+            // Obsługa wyświetlania nazwy pliku
+            document.getElementById('contractFile').addEventListener('change', function(e) {
+                const fileName = e.target.files[0] ? e.target.files[0].name : 'Nie wybrano pliku';
+                document.getElementById('file-name-display').textContent = fileName;
+            });
+            
+            // Obsługa kliknięcia na kroki
+            document.querySelectorAll('.step').forEach(step => {
+                step.addEventListener('click', function() {
+                    const stepNumber = parseInt(this.getAttribute('data-step'));
+                    skipToStep(stepNumber);
+                });
+            });
+        });
+        
+        // Formatowanie daty
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            
+            return `${day}.${month}.${year} ${hours}:${minutes}`;
+        }
+        
+        // Przejście do następnego kroku
+        function nextStep(step) {
+            if (validateStep(step)) {
+                hideStep(step);
+                currentStep = step + 1;
+                showStep(currentStep);
+                updateStepIndicators();
+                
+                // Symulacja automatycznych kroków
+                if (currentStep === 4) {
+                    simulateCBKVerification();
+                } else if (currentStep === 5) {
+                    simulateVATValidation();
+                }
+            }
+        }
+        
+        // Powrót do poprzedniego kroku
+        function prevStep(step) {
+            hideStep(step);
+            currentStep = step - 1;
+            showStep(currentStep);
+            updateStepIndicators();
+        }
+        
+        // Przejście do wybranego kroku (pomijanie)
+        function skipToStep(step) {
+            hideStep(currentStep);
+            currentStep = step;
+            showStep(currentStep);
+            updateStepIndicators();
+            
+            // Symulacja automatycznych kroków
+            if (currentStep === 4) {
+                simulateCBKVerification();
+            } else if (currentStep === 5) {
+                simulateVATValidation();
+            }
+        }
+        
+        // Ukrycie aktualnego kroku
+        function hideStep(step) {
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.remove('active');
+        }
+        
+        // Pokazanie nowego kroku
+        function showStep(step) {
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+        }
+        
+        // Aktualizacja wskaźników kroków
+        function updateStepIndicators() {
+            document.querySelectorAll('.step').forEach(step => {
+                const stepNumber = parseInt(step.getAttribute('data-step'));
+                step.classList.remove('active', 'completed');
+                
+                if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                } else if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+        }
+        
+        // Symulacja weryfikacji CBK
+        function simulateCBKVerification() {
+            const nipValue = document.getElementById('supplierNip').value;
+            const resultElement = document.getElementById('cbk-result');
+            
+            setTimeout(() => {
+                if (nipValue && nipValue.length === 10) {
+                    resultElement.textContent = 'Weryfikacja zakończona pomyślnie. Podmiot zweryfikowany.';
+                    resultElement.style.color = 'var(--success-color)';
+                } else {
+                    resultElement.textContent = 'Weryfikacja zakończona. Brak danych lub nieprawidłowy NIP.';
+                    resultElement.style.color = 'var(--error-color)';
+                }
+            }, 2000);
+        }
+        
+        // Symulacja walidacji VAT
+        function simulateVATValidation() {
+            const nipValue = document.getElementById('supplierNip').value;
+            const accountValue = document.getElementById('bankAccount').value;
+            const resultElement = document.getElementById('vat-result');
+            
+            setTimeout(() => {
+                if (nipValue && nipValue.length === 10 && accountValue && accountValue.length > 10) {
+                    resultElement.textContent = 'Walidacja zakończona pomyślnie. Rachunek znajduje się na Białej Liście VAT.';
+                    resultElement.style.color = 'var(--success-color)';
+                } else {
+                    resultElement.textContent = 'Walidacja zakończona. Rachunek nie figuruje na Białej Liście VAT lub nieprawidłowe dane.';
+                    resultElement.style.color = 'var(--error-color)';
+                }
+            }, 2000);
+        }
+        
+        // Walidacja kroku
+        function validateStep(step) {
+            let isValid = true;
+            
+            // Resetowanie komunikatów błędów
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.classList.remove('visible');
+            });
+            
+            document.querySelectorAll('input, select, textarea').forEach(input => {
+                input.classList.remove('error');
+            });
+            
+            // Walidacja w zależności od kroku
+            switch(step) {
+                case 1:
+                    // Walidacja danych dokumentu
+                    const supplierName = document.getElementById('supplierName');
+                    if (!supplierName.value || supplierName.value.length < 3 || supplierName.value.length > 100) {
+                        showError(supplierName, 'supplierName-error', 'Nazwa powinna mieć od 3 do 100 znaków.');
+                        isValid = false;
+                    }
+                    
+                    const supplierNip = document.getElementById('supplierNip');
+                    if (!supplierNip.value || !/^\d{10}$/.test(supplierNip.value)) {
+                        showError(supplierNip, 'supplierNip-error', 'Proszę wpisać 10-cyfrowy numer NIP.');
+                        isValid = false;
+                    }
+                    
+                    const contractNumber = document.getElementById('contractNumber');
+                    if (!contractNumber.value || !/^UM-\d{4}-\d{3}$/.test(contractNumber.value)) {
+                        showError(contractNumber, 'contractNumber-error', 'Proszę podać numer umowy w formacie UM-YYYY-NNN.');
+                        isValid = false;
+                    }
+                    
+                    const contractDate = document.getElementById('contractDate');
+                    if (!contractDate.value) {
+                        showError(contractDate, 'contractDate-error', 'Proszę wybrać datę umowy.');
+                        isValid = false;
+                    } else {
+                        const selectedDate = new Date(contractDate.value);
+                        const today = new Date();
+                        if (selectedDate > today) {
+                            showError(contractDate, 'contractDate-error', 'Nie można wybrać daty z przyszłości.');
+                            isValid = false;
+                        }
+                    }
+                    
+                    const documentType = document.getElementById('documentType');
+                    if (!documentType.value) {
+                        showError(documentType, 'documentType-error', 'Proszę wybrać typ dokumentu.');
+                        isValid = false;
+                    }
+                    
+                    const contractAmount = document.getElementById('contractAmount');
+                    if (!contractAmount.value || parseFloat(contractAmount.value) <= 0) {
+                        showError(contractAmount, 'contractAmount-error', 'Proszę wpisać kwotę większą od 0.');
+                        isValid = false;
+                    }
+                    
+                    const bankAccount = document.getElementById('bankAccount');
+                    if (!bankAccount.value || bankAccount.value.length < 15) {
+                        showError(bankAccount, 'bankAccount-error', 'Proszę podać numer rachunku w formacie IBAN.');
+                        isValid = false;
+                    }
+                    
+                    const contractFile = document.getElementById('contractFile');
+                    if (contractFile.files.length === 0) {
+                        showError(contractFile, 'contractFile-error', 'Proszę załączyć plik PDF.');
+                        isValid = false;
+                    } else if (!contractFile.files[0].name.toLowerCase().endsWith('.pdf')) {
+                        showError(contractFile, 'contractFile-error', 'Plik musi być w formacie PDF.');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 2:
+                    // Walidacja kontroli jakości
+                    const qcComplete = document.getElementById('qcComplete');
+                    if (!qcComplete.checked) {
+                        showError(qcComplete, 'qcComplete-error', 'Potwierdź, że wszystkie pola są wypełnione.');
+                        isValid = false;
+                    }
+                    
+                    const qcRemarks = document.getElementById('qcRemarks');
+                    if (qcRemarks.value.length > 500) {
+                        showError(qcRemarks, 'qcRemarks-error', 'Uwagi nie mogą przekraczać 500 znaków.');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 3:
+                    // Walidacja priorytetu
+                    const priorityLevel = document.getElementById('priorityLevel');
+                    if (!priorityLevel.value) {
+                        showError(priorityLevel, 'priorityLevel-error', 'Proszę wybrać priorytet dokumentu.');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 6:
+                    // Walidacja akceptacji kierownika
+                    const approvalDecision = document.getElementById('approvalDecision');
+                    if (!approvalDecision.checked) {
+                        showError(approvalDecision, 'approvalDecision-error', 'Proszę potwierdzić akceptację umowy.');
+                        isValid = false;
+                    }
+                    
+                    const approvalComments = document.getElementById('approvalComments');
+                    if (approvalComments.value.length > 500) {
+                        showError(approvalComments, 'approvalComments-error', 'Komentarz nie może przekroczyć 500 znaków.');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 7:
+                    // Walidacja recenzji prawnej
+                    const finalVersionReady = document.getElementById('finalVersionReady');
+                    if (!finalVersionReady.checked) {
+                        showError(finalVersionReady, 'finalVersionReady-error', 'Zaznacz, czy to już wersja do podpisu.');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 8:
+                    // Walidacja e-podpisu
+                    const signature = document.getElementById('signature');
+                    if (!signature.value) {
+                        showError(signature, 'signature-error', 'Proszę złożyć podpis elektroniczny.');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 9:
+                    // Walidacja rejestracji CRD
+                    const reviewReminderDate = document.getElementById('reviewReminderDate');
+                    if (!reviewReminderDate.value) {
+                        showError(reviewReminderDate, 'reviewReminderDate-error', 'Proszę wybrać datę przypomnienia.');
+                        isValid = false;
+                    }
+                    break;
+            }
+            
+            return isValid;
+        }
+        
+        // Wyświetlenie błędu
+        function showError(element, errorId, message) {
+            element.classList.add('error');
+            const errorElement = document.getElementById(errorId);
+            errorElement.textContent = message;
+            errorElement.classList.add('visible');
+        }
+        
+        // Zatwierdzenie formularza
+        function submitForm() {
+            if (validateStep(currentStep)) {
+                // Ukrycie formularza
+                document.getElementById('contractForm').style.display = 'none';
+                
+                // Wyświetlenie komunikatu sukcesu
+                const successMessage = document.getElementById('success-message');
+                successMessage.classList.add('active');
+                
+                // Wyświetlenie identyfikatora umowy
+                document.getElementById('success-contract-id').textContent = document.getElementById('contractNumber').value;
+            }
+        }
+        
+        // Reset formularza
+        function resetForm() {
+            // Ukrycie komunikatu sukcesu
+            document.getElementById('success-message').classList.remove('active');
+            
+            // Pokazanie formularza
+            document.getElementById('contractForm').style.display = 'block';
+            
+            // Reset pól formularza
+            document.getElementById('contractForm').reset();
+            
+            // Powrót do pierwszego kroku
+            hideStep(currentStep);
+            currentStep = 1;
+            showStep(currentStep);
+            updateStepIndicators();
+            
+            // Reset komunikatów błędów
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.classList.remove('visible');
+            });
+            
+            document.querySelectorAll('input, select, textarea').forEach(input => {
+                input.classList.remove('error');
+            });
+            
+            // Reset nazwy pliku
+            document.getElementById('file-name-display').textContent = '';
+            
+            // Ustawienie dzisiejszej daty dla pól automatycznych
+            const today = new Date();
+            const formattedDate = formatDate(today);
+            
+            document.getElementById('approvalDate').value = formattedDate;
+            document.getElementById('reviewDate').value = formattedDate;
+            document.getElementById('signatureDate').value = formattedDate;
+            
+            // Generowanie nowego identyfikatora CRD
+            const randomId = 'CRD-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            document.getElementById('crdEntryId').value = randomId;
+        }
+    </script>
+</body>
+</html>
